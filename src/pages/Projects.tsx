@@ -446,6 +446,19 @@ export default function Projects() {
               {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               {editProject ? "保存修改" : "添加项目"}
             </Button>
+            {editProject && (
+              <div className="pt-4 border-t mt-4">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-1"
+                  onClick={() => { setDialogOpen(false); setDeleteProject(editProject); }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  删除此项目
+                </Button>
+              </div>
+            )}
           </form>
         </DialogContent>
       </Dialog>
