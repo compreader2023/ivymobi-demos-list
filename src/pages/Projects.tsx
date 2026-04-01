@@ -412,23 +412,26 @@ export default function Projects() {
               />
               <p className="text-xs text-muted-foreground">请输入完整网址，以 https:// 开头</p>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label>账号</Label>
-                <Input
-                  value={formAccount}
-                  onChange={(e) => setFormAccount(e.target.value)}
-                  placeholder="选填"
-                />
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>账号</Label>
+                  <Input
+                    value={formAccount}
+                    onChange={(e) => setFormAccount(e.target.value)}
+                    placeholder="选填"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>密码</Label>
+                  <Input
+                    value={formPassword}
+                    onChange={(e) => setFormPassword(e.target.value)}
+                    placeholder="选填"
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label>密码</Label>
-                <Input
-                  value={formPassword}
-                  onChange={(e) => setFormPassword(e.target.value)}
-                  placeholder="选填"
-                />
-              </div>
+              <p className="text-xs text-amber-600">⚠ 不建议添加超管账号</p>
             </div>
             <div className="space-y-2">
               <Label>支持终端</Label>
