@@ -360,14 +360,6 @@ export default function Projects() {
                   <Button variant="ghost" size="icon" onClick={() => openEdit(p)}>
                     <Pencil className="h-4 w-4" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setDeleteProject(p)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -412,23 +404,26 @@ export default function Projects() {
               />
               <p className="text-xs text-muted-foreground">请输入完整网址，以 https:// 开头</p>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label>账号</Label>
-                <Input
-                  value={formAccount}
-                  onChange={(e) => setFormAccount(e.target.value)}
-                  placeholder="选填"
-                />
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>账号</Label>
+                  <Input
+                    value={formAccount}
+                    onChange={(e) => setFormAccount(e.target.value)}
+                    placeholder="选填"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>密码</Label>
+                  <Input
+                    value={formPassword}
+                    onChange={(e) => setFormPassword(e.target.value)}
+                    placeholder="选填"
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label>密码</Label>
-                <Input
-                  value={formPassword}
-                  onChange={(e) => setFormPassword(e.target.value)}
-                  placeholder="选填"
-                />
-              </div>
+              <p className="text-xs text-amber-600">⚠ 不建议添加超管账号</p>
             </div>
             <div className="space-y-2">
               <Label>支持终端</Label>
@@ -451,6 +446,19 @@ export default function Projects() {
               {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               {editProject ? "保存修改" : "添加项目"}
             </Button>
+            {editProject && (
+              <div className="pt-4 border-t mt-4">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-1"
+                  onClick={() => { setDialogOpen(false); setDeleteProject(editProject); }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  删除此项目
+                </Button>
+              </div>
+            )}
           </form>
         </DialogContent>
       </Dialog>
