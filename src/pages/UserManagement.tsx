@@ -289,7 +289,6 @@ export default function UserManagement() {
                   <SelectContent>
                     <SelectItem value="user">用户</SelectItem>
                     <SelectItem value="admin">管理员</SelectItem>
-                    <SelectItem value="superadmin">超级管理员</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
