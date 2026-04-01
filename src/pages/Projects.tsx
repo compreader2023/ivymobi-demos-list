@@ -360,14 +360,6 @@ export default function Projects() {
                   <Button variant="ghost" size="icon" onClick={() => openEdit(p)}>
                     <Pencil className="h-4 w-4" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setDeleteProject(p)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </div>
               </div>
             </CardContent>
