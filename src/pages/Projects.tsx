@@ -24,6 +24,13 @@ import {
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Plus,
   Search,
   X,
@@ -34,6 +41,7 @@ import {
   Smartphone,
   Loader2,
   Copy,
+  Tag,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -44,6 +52,7 @@ interface Project {
   account: string | null;
   password: string | null;
   platform: string;
+  category: string | null;
   created_by: string;
   updated_by: string;
   created_at: string;
@@ -52,7 +61,14 @@ interface Project {
   updater?: { name: string };
 }
 
+interface Category {
+  id: string;
+  name: string;
+}
+
 const PAGE_SIZE = 20;
+const NEW_CATEGORY = "__new__";
+const NO_CATEGORY = "__none__";
 
 export default function Projects() {
   const { user } = useAuth();
@@ -64,6 +80,8 @@ export default function Projects() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editProject, setEditProject] = useState<Project | null>(null);
   const [deleteProject, setDeleteProject] = useState<Project | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string>("all");
   const loaderRef = useRef<HTMLDivElement>(null);
 
   // Form state
@@ -72,7 +90,19 @@ export default function Projects() {
   const [formAccount, setFormAccount] = useState("");
   const [formPassword, setFormPassword] = useState("");
   const [formPlatform, setFormPlatform] = useState("PC");
+  const [formCategory, setFormCategory] = useState(NO_CATEGORY);
+  const [formNewCategory, setFormNewCategory] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const fetchCategories = useCallback(async () => {
+    const { data } = await supabase.from("categories").select("id, name").order("name");
+    setCategories(data || []);
+  }, []);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
 
   const fetchProjects = useCallback(
     async (offset: number, searchTerm: string, reset = false) => {
