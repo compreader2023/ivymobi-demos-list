@@ -533,6 +533,30 @@ export default function Projects() {
                 </div>
               </RadioGroup>
             </div>
+            <div className="space-y-2">
+              <Label>分类</Label>
+              <Select value={formCategory} onValueChange={setFormCategory}>
+                <SelectTrigger>
+                  <SelectValue placeholder="选择分类" />
+                </SelectTrigger>
+                <SelectContent className="z-[60]">
+                  <SelectItem value={NO_CATEGORY}>未分类</SelectItem>
+                  {categories.map((c) => (
+                    <SelectItem key={c.id} value={c.name}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value={NEW_CATEGORY}>+ 新建分类</SelectItem>
+                </SelectContent>
+              </Select>
+              {formCategory === NEW_CATEGORY && (
+                <Input
+                  value={formNewCategory}
+                  onChange={(e) => setFormNewCategory(e.target.value)}
+                  placeholder="请输入新分类名称"
+                />
+              )}
+            </div>
             <Button type="submit" className="w-full" disabled={submitting}>
               {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               {editProject ? "保存修改" : "添加项目"}
