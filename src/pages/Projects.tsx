@@ -302,7 +302,7 @@ export default function Projects() {
         target_name: deleteProject.name,
       });
       toast({ title: "项目已删除" });
-      fetchProjects(0, search, true);
+      fetchProjects(0, search, activeCategory, true);
     } else {
       toast({ title: "删除失败", description: error.message, variant: "destructive" });
     }
