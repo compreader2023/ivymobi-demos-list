@@ -369,6 +369,29 @@ export default function Projects() {
         </div>
       </div>
 
+      {/* Category filter */}
+      <div className="-mx-4 px-4 overflow-x-auto">
+        <div className="flex gap-2 w-max pb-1">
+          {[
+            { key: "all", label: "全部" },
+            ...categories.map((c) => ({ key: c.name, label: c.name })),
+            { key: "uncategorized", label: "未分类" },
+          ].map((c) => (
+            <button
+              key={c.key}
+              onClick={() => setActiveCategory(c.key)}
+              className={`px-3 py-1.5 rounded-full text-sm border transition-colors whitespace-nowrap ${
+                activeCategory === c.key
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-card text-muted-foreground border-border hover:text-foreground"
+              }`}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Project cards */}
       <div className="grid gap-3">
         {projects.map((p) => (
@@ -379,7 +402,14 @@ export default function Projects() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-semibold text-foreground">{p.name}</h3>
                     <PlatformBadge platform={p.platform} />
+                    {p.category && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-muted text-muted-foreground">
+                        <Tag className="h-3 w-3" />
+                        {p.category}
+                      </span>
+                    )}
                   </div>
+
                   <a
                     href={p.url}
                     target="_blank"
