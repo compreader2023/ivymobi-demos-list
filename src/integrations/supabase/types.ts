@@ -44,9 +44,34 @@ export type Database = {
         }
         Relationships: []
       }
+      categories: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       demo_projects: {
         Row: {
           account: string | null
+          category: string | null
           created_at: string
           created_by: string
           id: string
@@ -59,6 +84,7 @@ export type Database = {
         }
         Insert: {
           account?: string | null
+          category?: string | null
           created_at?: string
           created_by: string
           id?: string
@@ -71,6 +97,7 @@ export type Database = {
         }
         Update: {
           account?: string | null
+          category?: string | null
           created_at?: string
           created_by?: string
           id?: string

@@ -24,6 +24,13 @@ import {
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Plus,
   Search,
   X,
@@ -34,6 +41,7 @@ import {
   Smartphone,
   Loader2,
   Copy,
+  Tag,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -44,6 +52,7 @@ interface Project {
   account: string | null;
   password: string | null;
   platform: string;
+  category: string | null;
   created_by: string;
   updated_by: string;
   created_at: string;
@@ -52,7 +61,14 @@ interface Project {
   updater?: { name: string };
 }
 
+interface Category {
+  id: string;
+  name: string;
+}
+
 const PAGE_SIZE = 20;
+const NEW_CATEGORY = "__new__";
+const NO_CATEGORY = "__none__";
 
 export default function Projects() {
   const { user } = useAuth();
@@ -64,6 +80,8 @@ export default function Projects() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editProject, setEditProject] = useState<Project | null>(null);
   const [deleteProject, setDeleteProject] = useState<Project | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string>("all");
   const loaderRef = useRef<HTMLDivElement>(null);
 
   // Form state
@@ -72,10 +90,22 @@ export default function Projects() {
   const [formAccount, setFormAccount] = useState("");
   const [formPassword, setFormPassword] = useState("");
   const [formPlatform, setFormPlatform] = useState("PC");
+  const [formCategory, setFormCategory] = useState(NO_CATEGORY);
+  const [formNewCategory, setFormNewCategory] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  const fetchCategories = useCallback(async () => {
+    const { data } = await supabase.from("categories").select("id, name").order("name");
+    setCategories(data || []);
+  }, []);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+
   const fetchProjects = useCallback(
-    async (offset: number, searchTerm: string, reset = false) => {
+    async (offset: number, searchTerm: string, category: string, reset = false) => {
       setLoading(true);
       let query = supabase
         .from("demo_projects")
@@ -85,6 +115,11 @@ export default function Projects() {
 
       if (searchTerm) {
         query = query.ilike("name", `%${searchTerm}%`);
+      }
+      if (category === "uncategorized") {
+        query = query.is("category", null);
+      } else if (category !== "all") {
+        query = query.eq("category", category);
       }
 
       const { data, error } = await query;
@@ -126,22 +161,22 @@ export default function Projects() {
   );
 
   useEffect(() => {
-    fetchProjects(0, search, true);
-  }, [search]);
+    fetchProjects(0, search, activeCategory, true);
+  }, [search, activeCategory]);
 
   // Infinite scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !loading) {
-          fetchProjects(projects.length, search);
+          fetchProjects(projects.length, search, activeCategory);
         }
       },
       { threshold: 0.1 }
     );
     if (loaderRef.current) observer.observe(loaderRef.current);
     return () => observer.disconnect();
-  }, [hasMore, loading, projects.length, search]);
+  }, [hasMore, loading, projects.length, search, activeCategory]);
 
   const resetForm = () => {
     setFormName("");
@@ -149,6 +184,8 @@ export default function Projects() {
     setFormAccount("");
     setFormPassword("");
     setFormPlatform("PC");
+    setFormCategory(NO_CATEGORY);
+    setFormNewCategory("");
     setEditProject(null);
   };
 
@@ -164,13 +201,34 @@ export default function Projects() {
     setFormAccount(p.account || "");
     setFormPassword(p.password || "");
     setFormPlatform(p.platform);
+    setFormCategory(p.category || NO_CATEGORY);
+    setFormNewCategory("");
     setDialogOpen(true);
+  };
+
+  const resolveCategory = async (): Promise<string | null> => {
+    if (formCategory === NEW_CATEGORY) {
+      const name = formNewCategory.trim();
+      if (!name) return null;
+      if (!categories.some((c) => c.name === name)) {
+        await supabase.from("categories").insert({ name, created_by: user?.id ?? null });
+        await fetchCategories();
+      }
+      return name;
+    }
+    if (formCategory === NO_CATEGORY) return null;
+    return formCategory;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+    if (formCategory === NEW_CATEGORY && !formNewCategory.trim()) {
+      toast({ title: "请输入新分类名称", variant: "destructive" });
+      return;
+    }
     setSubmitting(true);
+    const category = await resolveCategory();
 
     if (editProject) {
       const { error } = await supabase
@@ -181,6 +239,7 @@ export default function Projects() {
           account: formAccount || null,
           password: formPassword || null,
           platform: formPlatform,
+          category,
           updated_by: user.id,
         })
         .eq("id", editProject.id);
@@ -203,6 +262,7 @@ export default function Projects() {
         account: formAccount || null,
         password: formPassword || null,
         platform: formPlatform,
+        category,
         created_by: user.id,
         updated_by: user.id,
       });
@@ -223,8 +283,9 @@ export default function Projects() {
     setSubmitting(false);
     setDialogOpen(false);
     resetForm();
-    fetchProjects(0, search, true);
+    fetchProjects(0, search, activeCategory, true);
   };
+
 
   const handleDelete = async () => {
     if (!deleteProject || !user) return;
@@ -241,7 +302,7 @@ export default function Projects() {
         target_name: deleteProject.name,
       });
       toast({ title: "项目已删除" });
-      fetchProjects(0, search, true);
+      fetchProjects(0, search, activeCategory, true);
     } else {
       toast({ title: "删除失败", description: error.message, variant: "destructive" });
     }
@@ -308,6 +369,29 @@ export default function Projects() {
         </div>
       </div>
 
+      {/* Category filter */}
+      <div className="-mx-4 px-4 overflow-x-auto">
+        <div className="flex gap-2 w-max pb-1">
+          {[
+            { key: "all", label: "全部" },
+            ...categories.map((c) => ({ key: c.name, label: c.name })),
+            { key: "uncategorized", label: "未分类" },
+          ].map((c) => (
+            <button
+              key={c.key}
+              onClick={() => setActiveCategory(c.key)}
+              className={`px-3 py-1.5 rounded-full text-sm border transition-colors whitespace-nowrap ${
+                activeCategory === c.key
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-card text-muted-foreground border-border hover:text-foreground"
+              }`}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Project cards */}
       <div className="grid gap-3">
         {projects.map((p) => (
@@ -318,7 +402,14 @@ export default function Projects() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-semibold text-foreground">{p.name}</h3>
                     <PlatformBadge platform={p.platform} />
+                    {p.category && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-muted text-muted-foreground">
+                        <Tag className="h-3 w-3" />
+                        {p.category}
+                      </span>
+                    )}
                   </div>
+
                   <a
                     href={p.url}
                     target="_blank"
@@ -441,6 +532,30 @@ export default function Projects() {
                   <Label htmlFor="both">PC/Mobile</Label>
                 </div>
               </RadioGroup>
+            </div>
+            <div className="space-y-2">
+              <Label>分类</Label>
+              <Select value={formCategory} onValueChange={setFormCategory}>
+                <SelectTrigger>
+                  <SelectValue placeholder="选择分类" />
+                </SelectTrigger>
+                <SelectContent className="z-[60]">
+                  <SelectItem value={NO_CATEGORY}>未分类</SelectItem>
+                  {categories.map((c) => (
+                    <SelectItem key={c.id} value={c.name}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value={NEW_CATEGORY}>+ 新建分类</SelectItem>
+                </SelectContent>
+              </Select>
+              {formCategory === NEW_CATEGORY && (
+                <Input
+                  value={formNewCategory}
+                  onChange={(e) => setFormNewCategory(e.target.value)}
+                  placeholder="请输入新分类名称"
+                />
+              )}
             </div>
             <Button type="submit" className="w-full" disabled={submitting}>
               {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
