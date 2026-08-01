@@ -105,7 +105,7 @@ export default function Projects() {
 
 
   const fetchProjects = useCallback(
-    async (offset: number, searchTerm: string, reset = false) => {
+    async (offset: number, searchTerm: string, category: string, reset = false) => {
       setLoading(true);
       let query = supabase
         .from("demo_projects")
@@ -115,6 +115,11 @@ export default function Projects() {
 
       if (searchTerm) {
         query = query.ilike("name", `%${searchTerm}%`);
+      }
+      if (category === "uncategorized") {
+        query = query.is("category", null);
+      } else if (category !== "all") {
+        query = query.eq("category", category);
       }
 
       const { data, error } = await query;
@@ -156,22 +161,22 @@ export default function Projects() {
   );
 
   useEffect(() => {
-    fetchProjects(0, search, true);
-  }, [search]);
+    fetchProjects(0, search, activeCategory, true);
+  }, [search, activeCategory]);
 
   // Infinite scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !loading) {
-          fetchProjects(projects.length, search);
+          fetchProjects(projects.length, search, activeCategory);
         }
       },
       { threshold: 0.1 }
     );
     if (loaderRef.current) observer.observe(loaderRef.current);
     return () => observer.disconnect();
-  }, [hasMore, loading, projects.length, search]);
+  }, [hasMore, loading, projects.length, search, activeCategory]);
 
   const resetForm = () => {
     setFormName("");
@@ -179,6 +184,8 @@ export default function Projects() {
     setFormAccount("");
     setFormPassword("");
     setFormPlatform("PC");
+    setFormCategory(NO_CATEGORY);
+    setFormNewCategory("");
     setEditProject(null);
   };
 
@@ -194,13 +201,34 @@ export default function Projects() {
     setFormAccount(p.account || "");
     setFormPassword(p.password || "");
     setFormPlatform(p.platform);
+    setFormCategory(p.category || NO_CATEGORY);
+    setFormNewCategory("");
     setDialogOpen(true);
+  };
+
+  const resolveCategory = async (): Promise<string | null> => {
+    if (formCategory === NEW_CATEGORY) {
+      const name = formNewCategory.trim();
+      if (!name) return null;
+      if (!categories.some((c) => c.name === name)) {
+        await supabase.from("categories").insert({ name, created_by: user?.id ?? null });
+        await fetchCategories();
+      }
+      return name;
+    }
+    if (formCategory === NO_CATEGORY) return null;
+    return formCategory;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+    if (formCategory === NEW_CATEGORY && !formNewCategory.trim()) {
+      toast({ title: "请输入新分类名称", variant: "destructive" });
+      return;
+    }
     setSubmitting(true);
+    const category = await resolveCategory();
 
     if (editProject) {
       const { error } = await supabase
@@ -211,6 +239,7 @@ export default function Projects() {
           account: formAccount || null,
           password: formPassword || null,
           platform: formPlatform,
+          category,
           updated_by: user.id,
         })
         .eq("id", editProject.id);
@@ -233,6 +262,7 @@ export default function Projects() {
         account: formAccount || null,
         password: formPassword || null,
         platform: formPlatform,
+        category,
         created_by: user.id,
         updated_by: user.id,
       });
@@ -253,8 +283,9 @@ export default function Projects() {
     setSubmitting(false);
     setDialogOpen(false);
     resetForm();
-    fetchProjects(0, search, true);
+    fetchProjects(0, search, activeCategory, true);
   };
+
 
   const handleDelete = async () => {
     if (!deleteProject || !user) return;
