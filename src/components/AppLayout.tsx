@@ -26,7 +26,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src={logo} alt="品冠天成文件管理" className="h-8 w-8 object-contain" />
-            <span className="text-sm font-medium text-foreground hidden sm:inline">品冠天成文件管理</span>
+            <span className="text-sm font-medium text-foreground hidden sm:inline">演示项目与文件管理</span>
           </div>
 
           {/* Desktop nav */}
