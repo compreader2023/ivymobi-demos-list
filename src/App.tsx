@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
 import Login from "./pages/Login";
 import Projects from "./pages/Projects";
+import Files from "./pages/Files";
 import UserManagement from "./pages/UserManagement";
 import Logs from "./pages/Logs";
 import AppLayout from "./components/AppLayout";
@@ -48,6 +49,8 @@ const App = () => (
           <Routes>
             <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
             <Route path="/" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+            <Route path="/files" element={<ProtectedRoute><Files /></ProtectedRoute>} />
+            <Route path="/files/:folderId" element={<ProtectedRoute><Files /></ProtectedRoute>} />
             <Route path="/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
             <Route path="/logs" element={<ProtectedRoute><Logs /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />

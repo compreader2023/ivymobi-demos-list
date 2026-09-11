@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
       .eq("user_id", caller.id)
       .single();
 
-    if (!callerProfile || (callerProfile.role !== "superadmin" && callerProfile.role !== "admin")) {
+    if (!callerProfile) {
       return new Response(JSON.stringify({ error: "权限不足" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

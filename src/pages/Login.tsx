@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Phone, Lock, Loader2 } from "lucide-react";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/logo.png";
 
 export default function Login() {
   const { signIn } = useAuth();
@@ -28,9 +28,9 @@ export default function Login() {
       <Card className="w-full max-w-md shadow-lg border-border/50">
         <CardHeader className="text-center space-y-4 pb-2">
           <div className="flex items-center justify-center gap-3">
-            <img src={logo} alt="样本通PIM" className="h-10" />
+            <img src={logo} alt="品冠天成文件管理" className="h-12 w-12 object-contain" />
           </div>
-          <p className="text-muted-foreground text-sm">演示项目管理平台</p>
+          <p className="text-muted-foreground text-sm">演示项目与文件管理平台</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
