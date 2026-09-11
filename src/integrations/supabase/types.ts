@@ -110,6 +110,113 @@ export type Database = {
         }
         Relationships: []
       }
+      file_tags: {
+        Row: {
+          created_at: string
+          file_id: string
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_id: string
+          tag_id: string
+        }
+        Update: {
+          created_at?: string
+          file_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "file_tags_file_id_fkey"
+            columns: ["file_id"]
+            isOneToOne: false
+            referencedRelation: "files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "file_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      files: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          folder_id: string
+          id: string
+          mime_type: string | null
+          name: string
+          size: number
+          storage_path: string
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          folder_id: string
+          id?: string
+          mime_type?: string | null
+          name: string
+          size?: number
+          storage_path: string
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          folder_id?: string
+          id?: string
+          mime_type?: string | null
+          name?: string
+          size?: number
+          storage_path?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "files_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      folders: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -137,6 +244,27 @@ export type Database = {
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      tags: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
         }
         Relationships: []
       }

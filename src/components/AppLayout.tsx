@@ -1,12 +1,13 @@
 import { ReactNode, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { LogOut, FolderOpen, Users, ScrollText, Menu, X } from "lucide-react";
+import { LogOut, FolderOpen, Users, ScrollText, Menu, X, FolderTree } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/logo.png";
 
 const navItems = [
   { path: "/", label: "演示项目", icon: FolderOpen },
+  { path: "/files", label: "文件管理", icon: FolderTree },
   { path: "/users", label: "用户管理", icon: Users },
   { path: "/logs", label: "操作日志", icon: ScrollText },
 ];
@@ -24,14 +25,15 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src={logo} alt="样本通PIM" className="h-8" />
-            <span className="text-sm font-medium text-foreground hidden sm:inline">演示项目与文件管理</span>
+            <img src={logo} alt="品冠天成文件管理" className="h-8 w-8 object-contain" />
+            <span className="text-sm font-medium text-foreground hidden sm:inline">品冠天成文件管理</span>
           </div>
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
-              const active = location.pathname === item.path;
+              const active =
+                item.path === "/" ? location.pathname === "/" : location.pathname.startsWith(item.path);
               return (
                 <Link key={item.path} to={item.path}>
                   <Button
@@ -71,7 +73,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-border bg-card px-4 py-2 space-y-1">
             {navItems.map((item) => {
-              const active = location.pathname === item.path;
+              const active =
+                item.path === "/" ? location.pathname === "/" : location.pathname.startsWith(item.path);
               return (
                 <Link key={item.path} to={item.path} onClick={() => setMobileMenuOpen(false)}>
                   <Button

@@ -199,12 +199,10 @@ export default function UserManagement() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-foreground">用户管理</h1>
-        {isAdminOrSuper && (
-          <Button onClick={openAdd} size="sm" className="gap-1">
-            <Plus className="h-4 w-4" />
-            添加用户
-          </Button>
-        )}
+        <Button onClick={openAdd} size="sm" className="gap-1">
+          <Plus className="h-4 w-4" />
+          添加用户
+        </Button>
       </div>
 
       {loading ? (
@@ -234,7 +232,7 @@ export default function UserManagement() {
                       <Pencil className="h-4 w-4" />
                     </Button>
                   )}
-                  {isAdminOrSuper && u.role !== "superadmin" && (
+                  {isSuperadmin && u.role !== "superadmin" && (
                     <Button
                       variant="ghost"
                       size="icon"

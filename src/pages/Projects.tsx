@@ -44,6 +44,7 @@ import {
   Tag,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import ViewToggle, { type ViewMode } from "@/components/ViewToggle";
 
 interface Project {
   id: string;
@@ -82,6 +83,7 @@ export default function Projects() {
   const [deleteProject, setDeleteProject] = useState<Project | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const loaderRef = useRef<HTMLDivElement>(null);
 
   // Form state
@@ -362,6 +364,7 @@ export default function Projects() {
               </button>
             )}
           </div>
+          <ViewToggle value={viewMode} onChange={setViewMode} />
           <Button onClick={openAdd} size="sm" className="gap-1 shrink-0">
             <Plus className="h-4 w-4" />
             添加项目
@@ -393,7 +396,7 @@ export default function Projects() {
       </div>
 
       {/* Project cards */}
-      <div className="grid gap-3">
+      <div className={viewMode === "grid" ? "grid gap-3 sm:grid-cols-2 xl:grid-cols-3" : "grid gap-3"}>
         {projects.map((p) => (
           <Card key={p.id} className="overflow-hidden">
             <CardContent className="p-4">
